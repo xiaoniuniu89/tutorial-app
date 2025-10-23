@@ -1,0 +1,10 @@
+# Tutorial configuration for Part 3
+
+title: "Multi-Step Autonomous Agent"
+description: "Build an agent that can autonomously plan and execute multi-step tasks like booking trips"
+author: "Tutorial Platform"
+
+series:
+  name: "Agent from Scratch"
+  part: 3
+  previousTutorial: "agent-tools"

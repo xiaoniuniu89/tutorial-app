@@ -8,3 +8,4 @@ series:
   name: "Agent from Scratch"
   part: 2
   previousTutorial: "simple-cli-agent"
+  nextTutorial: "multi-step-agent"
