@@ -46,13 +46,13 @@ export function TutorialList({ onSelectTutorial }: TutorialListProps) {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold">AI Training Tutorials</h1>
+            <div className="p-3 rounded-full bg-primary/10 ring-2 ring-primary/20">
+              <BookOpen className="h-8 w-8 text-primary" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Niu Tutorials
+            </h1>
           </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Learn to build powerful AI agents step-by-step with our interactive tutorials.
-            Each tutorial guides you through hands-on coding exercises.
-          </p>
         </div>
 
         {/* Tutorial Grid */}
@@ -63,7 +63,7 @@ export function TutorialList({ onSelectTutorial }: TutorialListProps) {
             return (
               <Card 
                 key={tutorialId} 
-                className="hover:shadow-lg transition-shadow cursor-pointer group"
+                className="hover:shadow-lg transition-all duration-300 cursor-pointer group border-l-4 border-l-primary/20 hover:border-l-primary"
                 onClick={() => onSelectTutorial(tutorialId)}
               >
                 <CardHeader>
@@ -83,17 +83,17 @@ export function TutorialList({ onSelectTutorial }: TutorialListProps) {
                 <CardContent className="space-y-4">
                   {/* Tutorial Metadata */}
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="flex items-center gap-1">
+                    <Badge variant="secondary" className="flex items-center gap-1 bg-primary/10 text-primary border-primary/20">
                       <Users className="h-3 w-3" />
                       {tutorial.steps.length} steps
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1">
+                    <Badge variant="outline" className="flex items-center gap-1 hover:bg-accent/50 transition-colors">
                       <Users className="h-3 w-3" />
                       {metadata.author}
                     </Badge>
                     {/* Series badge (if present) */}
                     {metadata.series?.name && (
-                      <Badge variant="outline" className="flex items-center gap-1" title={`Series: ${metadata.series.name}`}>
+                      <Badge variant="outline" className="flex items-center gap-1 bg-accent/10 border-accent/30 text-accent-foreground hover:bg-accent/20 transition-colors" title={`Series: ${metadata.series.name}`}>
                         <span className="text-xs font-medium">{metadata.series.name}</span>
                         {typeof metadata.series.part === 'number' && (
                           <span className="text-xxs text-muted-foreground">· Part {metadata.series.part}</span>
@@ -146,7 +146,7 @@ export function TutorialList({ onSelectTutorial }: TutorialListProps) {
               </div>
               
               <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Learn how to create engaging, step-by-step tutorials for the AI Training system. 
+                Learn how to create engaging, step-by-step tutorials for the Niu Training system. 
                 Our interactive guide will teach you everything from markdown structure to advanced features.
               </p>
               

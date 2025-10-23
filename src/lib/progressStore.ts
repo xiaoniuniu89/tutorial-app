@@ -12,12 +12,22 @@ export interface TutorialProgress {
   };
 }
 
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  lastUpdated?: number;
+}
+
 interface ProgressData {
   tutorials: TutorialProgress;
+  preferences: UserPreferences;
 }
 
 const defaultData: ProgressData = {
   tutorials: {},
+  preferences: {
+    theme: 'system',
+    lastUpdated: Date.now(),
+  },
 };
 
 // Initialize the database with LocalStorage
@@ -115,4 +125,39 @@ export function resetAllProgress(): void {
  */
 export function getAllProgress(): TutorialProgress {
   return db.data.tutorials;
+}
+
+/**
+ * Set user theme preference
+ */
+export function setThemePreference(theme: 'light' | 'dark' | 'system'): void {
+  db.data.preferences.theme = theme;
+  db.data.preferences.lastUpdated = Date.now();
+  db.write();
+}
+
+/**
+ * Get user theme preference
+ */
+export function getThemePreference(): 'light' | 'dark' | 'system' {
+  return db.data.preferences.theme;
+}
+
+/**
+ * Get all user preferences
+ */
+export function getUserPreferences(): UserPreferences {
+  return db.data.preferences;
+}
+
+/**
+ * Update user preferences
+ */
+export function updateUserPreferences(preferences: Partial<UserPreferences>): void {
+  db.data.preferences = {
+    ...db.data.preferences,
+    ...preferences,
+    lastUpdated: Date.now(),
+  };
+  db.write();
 }
