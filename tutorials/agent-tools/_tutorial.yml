@@ -1,0 +1,10 @@
+# Tutorial configuration for Part 2
+
+title: "Agent Tools & Function Calling"
+description: "Add real capabilities to your agent with tools and function calling"
+author: "Tutorial Platform"
+
+series:
+  name: "Agent from Scratch"
+  part: 2
+  previousTutorial: "simple-cli-agent"

@@ -1,0 +1,11 @@
+# Optional tutorial configuration
+# Only needed for custom metadata or series information
+
+title: "Simple CLI Chat Agent"
+description: "Build a command-line chat agent with OpenAI using simple functional code"
+author: "Tutorial Platform"
+
+series:
+  name: "Agent from Scratch"
+  part: 1
+  nextTutorial: "agent-tools"

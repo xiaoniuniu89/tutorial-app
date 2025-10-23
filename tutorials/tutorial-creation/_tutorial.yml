@@ -1,0 +1,6 @@
+# Optional tutorial configuration
+# Only needed for custom metadata or series information
+
+title: "Creating Interactive Tutorials"
+description: "Learn how to create step-by-step interactive tutorials using frontmatter-based markdown files"
+author: "Tutorial Platform"
