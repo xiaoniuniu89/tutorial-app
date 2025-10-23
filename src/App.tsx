@@ -5,7 +5,7 @@ import { DebugPanel } from './components/DebugPanel';
 import './App.css';
 import { Button } from './components/ui/button';
 import { ChevronLeft, Moon, Sun } from 'lucide-react';
-import { getThemePreference, setThemePreference, getUserPreferences } from './lib/progressStore';
+import { getThemePreference, setThemePreference } from './lib/progressStore';
 
 function App() {
   const [selectedTutorial, setSelectedTutorial] = useState<string | null>(null);
