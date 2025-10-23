@@ -5,7 +5,31 @@ description: "Initialize the OpenAI client and create a simple chat function"
 
 # Setting Up OpenAI
 
-Let's set up a simple OpenAI client to send messages and get responses.
+Let's set up a simple OpenAI client to send messages and get responses with proper TypeScript types.
+
+## Create the Types File
+
+First, create a `types.ts` file for type safety:
+
+```typescript
+// types.ts
+import type OpenAI from 'openai';
+
+// Use OpenAI's built-in types for messages
+export type ChatMessageArray = OpenAI.Chat.Completions.ChatCompletionMessageParam[];
+
+// Function types
+export type ChatFunction = (messages: ChatMessageArray) => Promise<string>;
+
+// Error types
+export interface APIError extends Error {
+  status?: number;
+  response?: {
+    status: number;
+    statusText: string;
+  };
+}
+```
 
 ## Create the OpenAI Client File
 
@@ -14,6 +38,7 @@ Create a file called `openai-client.ts`:
 ```typescript
 // openai-client.ts
 import OpenAI from 'openai';
+import type { ChatMessageArray } from './types';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -24,17 +49,14 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Simple function to send a message and get a response
-export async function chat(userMessage: string): Promise<string> {
+// Chat function with conversation history support
+export async function chat(messages: ChatMessageArray): Promise<string> {
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
-    messages: [
-      { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: userMessage }
-    ]
+    messages
   });
 
-  return response.choices[0].message.content || 'No response';
+  return response.choices[0]?.message?.content || 'No response';
 }
 ```
 
@@ -54,15 +76,19 @@ const openai = new OpenAI({
 ```
 Initialize the OpenAI client with your API key.
 
-**Simple chat function:**
+**Chat function with proper typing:**
 ```typescript
-export async function chat(userMessage: string): Promise<string>
+export async function chat(messages: ChatMessageArray): Promise<string>
 ```
-- Takes a user message as input
-- Sends it to OpenAI's GPT-4o-mini model
-- Returns the AI's response
+- Takes an array of messages (conversation history)
+- Uses OpenAI's built-in types for type safety
+- Returns the AI's response as a string
+- Handles null/undefined responses gracefully
 
-That's it! A simple, straightforward function to chat with AI.
+**Type safety benefits:**
+- `ChatMessageArray` ensures messages have the correct structure
+- TypeScript will catch type errors at compile time
+- Better IDE support with autocomplete and error checking
 
 ## Test It Out
 
@@ -71,9 +97,15 @@ Let's test it quickly. Create a test file:
 **test.ts**
 ```typescript
 import { chat } from './openai-client';
+import type { ChatMessageArray } from './types';
 
 async function test() {
-  const response = await chat('Hello! What can you help me with?');
+  const messages: ChatMessageArray = [
+    { role: 'system', content: 'You are a helpful assistant.' },
+    { role: 'user', content: 'Hello! What can you help me with?' }
+  ];
+  
+  const response = await chat(messages);
   console.log('AI:', response);
 }
 

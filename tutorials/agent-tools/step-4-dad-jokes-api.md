@@ -26,24 +26,48 @@ We'll use the [icanhazdadjoke.com](https://icanhazdadjoke.com/) API because:
 - ✅ It's reliable
 - ✅ It's fun!
 
-## Step 1: Add the Tool Function
+## Step 1: Add Types for Dad Joke
 
-Open your `tools.js` file and add this function:
+First, let's add the types for our Dad Joke response to `types.ts`:
 
-```javascript
-// tools.js
+```typescript
+// Add to types.ts
+
+export interface DadJokeResponse {
+  id: string;
+  joke: string;
+  status: number;
+}
+
+// Error types
+export interface APIError extends Error {
+  status?: number;
+  response?: {
+    status: number;
+    statusText: string;
+  };
+}
+```
+
+## Step 2: Add the Tool Function
+
+Open your `tools.ts` file and add this function:
+
+```typescript
+// tools.ts
+import type { CalculatorOperation, ToolResult, DadJokeResponse, APIError } from './types';
 
 /**
  * Calculator tool (from before)
  */
-export function calculator(a, b, operation) {
+export function calculator(a: number, b: number, operation: CalculatorOperation): ToolResult {
   // ... existing calculator code ...
 }
 
 /**
  * Fetches a random dad joke from the icanhazdadjoke API
  */
-export async function getDadJoke() {
+export async function getDadJoke(): Promise<ToolResult> {
   try {
     const response = await fetch('https://icanhazdadjoke.com/', {
       headers: {
@@ -56,11 +80,12 @@ export async function getDadJoke() {
       return `Error: Failed to fetch joke (${response.status})`;
     }
     
-    const data = await response.json();
+    const data = await response.json() as DadJokeResponse;
     return data.joke;
     
   } catch (error) {
-    return `Error: ${error.message}`;
+    const apiError = error as APIError;
+    return `Error: ${apiError.message}`;
   }
 }
 ```
@@ -70,8 +95,8 @@ export async function getDadJoke() {
 Let's break it down:
 
 ### The `async` Keyword
-```javascript
-export async function getDadJoke() {
+```typescript
+export async function getDadJoke(): Promise<ToolResult> {
 ```
 - We use `async` because fetching from an API takes time
 - The function will return a Promise
@@ -109,22 +134,23 @@ if (!response.ok) {
 - Returns helpful error message if something went wrong
 
 ### Getting the Joke
-```javascript
-const data = await response.json();
+```typescript
+const data = await response.json() as DadJokeResponse;
 return data.joke;
 ```
 - Parse the JSON response
 - Extract just the joke text
 - Return it as a string
 
-## Step 2: Add the Tool Definition
+## Step 3: Add the Tool Definition
 
-Open `toolDefinitions.js` and add this to the `toolDefinitions` array:
+Open `toolDefinitions.ts` and add this to the `toolDefinitions` array:
 
-```javascript
-// toolDefinitions.js
+```typescript
+// toolDefinitions.ts
+import type OpenAI from 'openai';
 
-export const toolDefinitions = [
+export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   // ... existing calculator definition ...
   
   {
@@ -148,15 +174,15 @@ Notice `properties: {}` and `required: []`?
 
 This tool doesn't need any parameters! It just fetches a random joke. But we still need to include the `parameters` object with its structure - that's part of OpenAI's schema.
 
-## Step 3: Test the Tool
+## Step 4: Test the Tool
 
 Let's test it before integrating it into the agent.
 
-Create a quick test file called `test-dad-joke.js`:
+Create a quick test file called `test-dad-joke.ts`:
 
-```javascript
-// test-dad-joke.js
-import { getDadJoke } from './tools.js';
+```typescript
+// test-dad-joke.ts
+import { getDadJoke } from './tools';
 
 console.log('Fetching a dad joke...\n');
 
@@ -170,7 +196,7 @@ getDadJoke().then(joke => {
 Run it:
 
 ```bash
-node test-dad-joke.js
+npx ts-node test-dad-joke.ts
 ```
 
 You should see a random dad joke! Try running it a few times to get different jokes.
@@ -202,11 +228,12 @@ When a user says "Tell me a joke", the AI will:
 
 What if the API is down? Our error handling catches it:
 
-```javascript
+### Error Handling
+```typescript
 catch (error) {
-  return `Error: ${error.message}`;
+  const apiError = error as APIError;
+  return `Error: ${apiError.message}`;
 }
-```
 
 The AI will receive the error message and can tell the user something like:
 > "Sorry, I couldn't fetch a joke right now. The joke API might be temporarily unavailable."

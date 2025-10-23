@@ -12,7 +12,7 @@ Our chat agent remembers everything - but that's actually a problem! Let's learn
 Remember how we store every message in an array?
 
 ```typescript
-const messages = [
+const messages: ChatMessageArray = [
   { role: 'system', content: '...' },
   { role: 'user', content: 'Hello' },
   { role: 'assistant', content: 'Hi there!' },
@@ -81,9 +81,10 @@ Let's update our chat to only keep the last 10 messages:
 ```typescript
 import * as readline from 'readline';
 import { chat } from './openai-client';
+import type { ChatMessageArray } from './types';
 
 // System message + message history
-const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+const messages: ChatMessageArray = [
   { role: 'system', content: 'You are a helpful assistant. Keep responses clear and friendly.' }
 ];
 
@@ -97,7 +98,7 @@ const rl = readline.createInterface({
 });
 
 // Function to keep only recent messages
-function trimMemory() {
+function trimMemory(): void {
   // Keep system message (first one) + last MAX_MESSAGES messages
   if (messages.length > MAX_MESSAGES + 1) {
     const systemMessage = messages[0];
@@ -110,7 +111,7 @@ function trimMemory() {
 }
 
 // Main chat loop
-async function chatLoop() {
+async function chatLoop(): Promise<void> {
   rl.question('You: ', async (input) => {
     if (input.toLowerCase() === 'exit') {
       console.log('👋 Goodbye!');
@@ -159,7 +160,7 @@ We'll only remember the last 10 messages (5 exchanges of back-and-forth).
 
 **2. The trimMemory function:**
 ```typescript
-function trimMemory() {
+function trimMemory(): void {
   if (messages.length > MAX_MESSAGES + 1) {
     // Keep system message + last 10 messages
     const systemMessage = messages[0];

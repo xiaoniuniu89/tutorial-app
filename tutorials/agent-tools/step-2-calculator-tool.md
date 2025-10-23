@@ -15,17 +15,47 @@ Every tool needs two parts:
 1. **Definition** - Tells the AI what the tool does and how to use it
 2. **Implementation** - The actual JavaScript function that does the work
 
-## Step 1: Create the Calculator Function
+## Step 1: Create the Types
 
-Create a new file called `tools.js`:
+First, let's create a types file for type safety. Create `types.ts`:
 
-```javascript
-// tools.js
+```typescript
+// types.ts
+import type OpenAI from 'openai';
+
+// Use OpenAI's built-in types for messages
+export type ChatMessageArray = OpenAI.Chat.Completions.ChatCompletionMessageParam[];
+
+// For our internal use, create a type that represents assistant messages with tool calls
+export type AssistantMessageWithTools = OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam & {
+  tool_calls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[];
+};
+
+// Tool function types
+export type CalculatorOperation = 'add' | 'subtract' | 'multiply' | 'divide';
+
+export interface CalculatorArgs {
+  a: number;
+  b: number;
+  operation: CalculatorOperation;
+}
+
+// Tool execution result types
+export type ToolResult = string | number;
+```
+
+## Step 2: Create the Calculator Function
+
+Create a new file called `tools.ts`:
+
+```typescript
+// tools.ts
+import type { CalculatorOperation, ToolResult } from './types';
 
 /**
  * Calculator tool - performs basic math operations
  */
-export function calculator(a, b, operation) {
+export function calculator(a: number, b: number, operation: CalculatorOperation): ToolResult {
   const numA = Number(a);
   const numB = Number(b);
   
@@ -49,18 +79,19 @@ export function calculator(a, b, operation) {
 
 Simple! Just a JavaScript function that takes two numbers and an operation.
 
-## Step 2: Define the Tool for OpenAI
+## Step 3: Define the Tool for OpenAI
 
-Now we need to tell OpenAI about this tool. Create a new file called `toolDefinitions.js`:
+Now we need to tell OpenAI about this tool. Create a new file called `toolDefinitions.ts`:
 
-```javascript
-// toolDefinitions.js
+```typescript
+// toolDefinitions.ts
+import type OpenAI from 'openai';
 
 /**
  * Tool definitions for OpenAI
  * These tell the AI what tools exist and how to use them
  */
-export const toolDefinitions = [
+export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   {
     type: "function",
     function: {
@@ -133,9 +164,9 @@ Your code will then:
 
 Before we integrate this into the agent, let's test the calculator function directly.
 
-Add this to the bottom of `tools.js` temporarily:
+Add this to the bottom of `tools.ts` temporarily:
 
-```javascript
+```typescript
 // Quick test (remove this later)
 console.log(calculator(10, 5, 'add'));        // Should print: 15
 console.log(calculator(10, 5, 'multiply'));   // Should print: 50
@@ -145,7 +176,7 @@ console.log(calculator(10, 0, 'divide'));     // Should print: Error message
 Run it:
 
 ```bash
-node tools.js
+npx ts-node tools.ts
 ```
 
 You should see:

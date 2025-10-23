@@ -13,7 +13,7 @@ Before we add more tools, let's understand **exactly** how tool definitions work
 
 Every tool definition follows this pattern:
 
-```javascript
+```typescript
 {
   type: "function",
   function: {
@@ -27,7 +27,7 @@ Every tool definition follows this pattern:
       required: ["list", "of", "required", "params"]
     }
   }
-}
+} as const satisfies OpenAI.Chat.Completions.ChatCompletionTool
 ```
 
 ## The Three Key Parts
@@ -66,7 +66,7 @@ This is where you define what arguments the function takes.
 
 #### Simple Parameter Example
 
-```javascript
+```typescript
 parameters: {
   type: "object",
   properties: {
@@ -76,14 +76,14 @@ parameters: {
     }
   },
   required: ["city"]
-}
+} as const
 ```
 
 This defines a tool that needs one required string parameter called `city`.
 
 #### Multiple Parameters Example
 
-```javascript
+```typescript
 parameters: {
   type: "object",
   properties: {
@@ -101,7 +101,7 @@ parameters: {
     }
   },
   required: ["query"]  // Only query is required, others are optional
-}
+} as const
 ```
 
 ## Parameter Types
@@ -120,10 +120,10 @@ OpenAI supports these parameter types:
 
 Sometimes you want to restrict parameters to specific values:
 
-```javascript
+```typescript
 operation: {
   type: "string",
-  enum: ["add", "subtract", "multiply", "divide"],
+  enum: ["add", "subtract", "multiply", "divide"] as const,
   description: "The math operation to perform"
 }
 ```
@@ -132,7 +132,7 @@ Now the AI can **only** choose from these four operations.
 
 ## Optional vs Required Parameters
 
-```javascript
+```typescript
 parameters: {
   type: "object",
   properties: {
@@ -142,12 +142,12 @@ parameters: {
     },
     units: {
       type: "string",
-      enum: ["celsius", "fahrenheit"],
+      enum: ["celsius", "fahrenheit"] as const,
       description: "Temperature units (defaults to celsius)"
     }
   },
   required: ["city"]  // Only city is required, units is optional
-}
+} as const
 ```
 
 If `units` isn't provided, your function should use a default value.
@@ -156,7 +156,14 @@ If `units` isn't provided, your function should use a default value.
 
 Let's put it all together:
 
-```javascript
+```typescript
+// First define the interface for the tool arguments
+interface WeatherArgs {
+  city: string;
+  units?: 'celsius' | 'fahrenheit';
+}
+
+// Then create the tool definition with proper typing
 {
   type: "function",
   function: {
@@ -171,14 +178,14 @@ Let's put it all together:
         },
         units: {
           type: "string",
-          enum: ["celsius", "fahrenheit"],
+          enum: ["celsius", "fahrenheit"] as const,
           description: "Temperature unit (default: celsius)"
         }
       },
       required: ["city"]
     }
   }
-}
+} as const satisfies OpenAI.Chat.Completions.ChatCompletionTool
 ```
 
 When a user asks "What's the weather in Paris?", the AI might generate:
@@ -230,8 +237,13 @@ parameters: {
 
 ## Quick Reference
 
-```javascript
-// Complete tool definition template
+```typescript
+// Complete tool definition template with TypeScript
+interface YourToolArgs {
+  param1: string;
+  param2?: number;  // Optional parameter
+}
+
 {
   type: "function",
   function: {
@@ -247,13 +259,13 @@ parameters: {
         param2: {
           type: "number",
           description: "Another parameter",
-          enum: [1, 2, 3]  // Optional: limit to specific values
+          enum: [1, 2, 3] as const  // Optional: limit to specific values
         }
       },
       required: ["param1"]  // List required parameters
     }
   }
-}
+} as const satisfies OpenAI.Chat.Completions.ChatCompletionTool
 ```
 
 ## What's Next?

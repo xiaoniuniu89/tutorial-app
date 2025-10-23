@@ -28,6 +28,28 @@ npm install openai dotenv
 npm install -D @types/node typescript ts-node
 `
 
+## TypeScript Configuration
+
+Create a `tsconfig.json` file in your project root with the following content:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "ts-node": {
+    "esm": false
+  }
+}
+```
+
 ## Environment Configuration
 
 Create a `.env` file in your project root to store your OpenAI API key securely:

@@ -19,16 +19,44 @@ First, make sure your `package.json` has the right structure:
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "dev": "npx ts-node index.ts",
+    "build": "npx tsc",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "openai": "^4.70.3",
     "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.0"
   }
 }
 ```
 
-The `"type": "module"` line is crucial — it tells Node.js to use ES modules (so we can use `import`/`export`).
+## Setup tsconfig.json
+
+Create a TypeScript configuration file:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
 
 ## Environment Setup
 
@@ -38,20 +66,88 @@ Make sure your `.env` file has your OpenAI API key:
 OPENAI_API_KEY=your_api_key_here
 ```
 
-## Test 1: Calculator Tool
+## Install Dependencies
 
-Start with a simple math question:
+First, install all dependencies:
 
 ```bash
-npm start "What is 50 times 30?"
+npm install
 ```
 
-Expected output:
+## Test 1: Calculator Tool
 
-```json
-{
-  "result": 1500
-}
+Start the development server and ask a math question:
+
+```bash
+npm run dev
 ```
 
-You should see the agent call the calculator tool with arguments like `{ a: 50, b: 30, operation: 'multiply' }` and return the result.
+Then type in the chat:
+
+```
+You: What is 50 times 30?
+```
+
+Expected output should include something like:
+
+```
+🔧 AI is calling tool: calculator
+📝 Arguments: { a: 50, b: 30, operation: 'multiply' }
+✅ Tool result: 1500
+
+AI: The answer is 1,500
+```
+
+## Test 2: Dad Joke Tool
+
+Try asking for a joke:
+
+```
+You: Tell me a dad joke
+```
+
+Expected output should include:
+
+```
+🔧 AI is calling tool: get_dad_joke
+📝 Arguments: {}
+✅ Tool result: Why don't scientists trust atoms? Because they make up everything!
+
+AI: Here's a dad joke for you: Why don't scientists trust atoms? Because they make up everything! 😄
+```
+
+## Test 3: Multiple Tools
+
+Try a request that might use both tools:
+
+```
+You: Calculate 100 divided by 4 and then tell me a joke to celebrate
+```
+
+The AI might call both tools in sequence!
+
+## Test 4: Error Handling
+
+Test error conditions:
+
+```
+You: What is 10 divided by 0?
+```
+
+Should handle the division by zero gracefully:
+
+```
+✅ Tool result: Error: Cannot divide by zero
+AI: I can't divide by zero as that's mathematically undefined.
+```
+
+## Building for Production
+
+When ready for production, build the TypeScript:
+
+```bash
+npm run build
+npm start
+```
+
+This compiles your TypeScript to JavaScript and runs the compiled version.
