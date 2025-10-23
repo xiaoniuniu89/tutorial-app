@@ -33,6 +33,20 @@ const defaultData: ProgressData = {
 // Initialize the database with LocalStorage
 const db = LocalStoragePreset<ProgressData>('tutorial-progress', defaultData);
 
+// Migrate existing data to ensure preferences exist
+function migrateData(): void {
+  if (!db.data.preferences) {
+    db.data.preferences = {
+      theme: 'system',
+      lastUpdated: Date.now(),
+    };
+    db.write();
+  }
+}
+
+// Run migration on initialization
+migrateData();
+
 /**
  * Mark a step as visited
  */
